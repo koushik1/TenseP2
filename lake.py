@@ -13,6 +13,14 @@ def DisplayArray(a, fmt='jpeg', rng=[0,1]):
   """Display an array as a picture."""
   a = (a - rng[0])/float(rng[1] - rng[0])*255
   a = np.uint8(np.clip(a, 0, 255))
+
+  global N
+  h = float(1)/N
+  with open('lake_c.dat','w') as f:
+      for i in range(len(a)):
+        for j in range(len(a[i])):
+          f.write(str(i*h)+" "+str(j*h)+" "+str(a[i][j])+'\n')
+
   with open("lake_py.jpg","w") as f:
       PIL.Image.fromarray(a).save(f, "jpeg")
 
@@ -42,15 +50,23 @@ def laplace(x):
   nine_point = [[0.25, 1.0, 0.25],
                 [1.00, -5., 1.00],
                 [0.25, 1.0, 0.25]]
-						   
-  laplace_k = make_kernel(nine_point)
+
+  thirteeen_point = [[0.000,0.000,0.000,0.125,0.000,0.000,0.000],
+                    [0.000,0.000,0.000,0.250,0.000,0.000,0.000],
+                    [0.000,0.000,0.000,1.000,0.000,0.000,0.000],
+                    [0.125,0.250,1.000,-5.50,1.000,0.250,0.125],
+                    [0.000,0.000,0.000,1.000,0.000,0.000,0.000],
+                    [0.000,0.000,0.000,0.250,0.000,0.000,0.000],
+                     [0.000,0.000,0.000,0.125,0.000,0.000,0.000]]
+   
+  laplace_k = make_kernel(thirteeen_point)
   return simple_conv(x, laplace_k)
 
 # Define the PDE
 if len(sys.argv) != 4:
-	print "Usage:", sys.argv[0], "N npebs num_iter"
-	sys.exit()
-	
+  print "Usage:", sys.argv[0], "N npebs num_iter"
+  sys.exit()
+  
 N = int(sys.argv[1])
 npebs = int(sys.argv[2])
 num_iter = int(sys.argv[3])
